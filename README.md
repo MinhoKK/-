@@ -74,15 +74,14 @@
 ## 📋 Diagram
 
 ### 1.1 Flow Chart
-![flowchart.drawio](/uploads/58980f03fcf01234d938b2d58aa08e52/flowchart.drawio.png)
+![flowchart drawio](https://github.com/user-attachments/assets/b161c68a-7c4c-44cf-8595-9c1102ccfd76)
 
 
 ### 1.2. ERD
-![체크인홈ERD](/uploads/9e16807abeac462f79d53cfa3705aab6/체크인홈ERD.PNG)
+![체크인홈ERD](https://github.com/user-attachments/assets/c430726a-eb34-40cc-8d23-b57f0db7316b)
 
 ### 1.3 Architecture
-![image](/uploads/1fb6b2ff15c07ef6d485521f47458e51/image.png)
-
+![아키테겇](https://github.com/user-attachments/assets/e7e9a53f-a58a-4305-ad6e-4cf329bed89d)
 
 ## 🖥️ Service
 
@@ -125,5 +124,4 @@
 
 
 ## ▶️ Video
-
-![체크인홈](/uploads/f56f31fca95759fc75394ad9ce5d0b7a/체크인홈.mp4)
+https://www.youtube.com/watch?v=hl7in7zDqX4&t=193s
