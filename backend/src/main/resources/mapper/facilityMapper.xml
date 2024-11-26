@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.facility.mapper.FacilityMapper">
+
+	  	<!-- Facility 개괄정보 -->
+	  	<resultMap type="FacilityDto" id="FacilityDto">
+			<result column="facility_name" property="facilityName"/>
+			<result column="category" property="category"/>
+			<result column="road_address" property="roadAddress"/>
+			<result column="lat" property="lat"/>
+			<result column="lon" property="lon"/>
+		</resultMap>
+		
+		
+	  <!-- 법정동 코드로 아파트 가져오는 코드-->
+		<select id="getAllFacility" parameterType="Map" resultMap="FacilityDto">
+		  <![CDATA[
+		    SELECT
+		        facility_name,
+		        category,
+		        road_address,
+		        lat,
+		        lon
+		    FROM
+		        facilities
+		    WHERE
+		        ST_Distance_Sphere(${point}, geom) <= 500;
+		  ]]>
+		</select>
+	  
+	
+</mapper>	

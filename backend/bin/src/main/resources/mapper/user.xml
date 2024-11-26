@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.ssafy.user.mapper.UserMapper">
+	
+	<resultMap type="user" id="user">
+		<result column="user_id" property="userId"/>
+		<result column="password" property="password"/>
+		<result column="name" property="name"/>
+		<result column="address" property="address"/>
+		<result column="role" property="role"/>
+	</resultMap>
+	
+	<select id="login" resultMap="user">
+		select *
+		from users
+		where user_id = #{userId} and password = #{password}
+	</select>
+	
+	<insert id="join">
+		insert into users (user_id, password, name, address)
+		values (#{userId}, #{password}, #{name}, #{address})
+	</insert>
+
+	<update id="modify">
+		update users set address = #{address}, password = #{password}
+		where user_id = #{userId}
+	</update>
+	
+	<select id="findByUserId" resultMap="user">
+		select *
+		from users
+		where user_id = #{userId}
+	</select>
+	
+	<sql id="search">
+		<if test="word != null and word != ''">
+			<if test="key == 'address'">
+				where address like concat('%', #{word}, '%')
+			</if>
+			<if test="key == 'role'">
+				where role = #{word}
+			</if>
+		</if>
+	</sql>
+	
+	<select id="findAll" parameterType="map" resultMap="user">
+		select *
+		from users
+		<include refid="search"></include>
+	</select>
+	
+	<update id="modifyByAdmin">
+		update users set user_id = #{userId}, password = #{password}, name = #{name}, address = #{address}, role = #{role}
+		where user_id = #{userId}
+	</update>
+	
+	<delete id="delete">
+		delete from users 
+		where user_id = #{userId}
+	</delete>
+
+</mapper>

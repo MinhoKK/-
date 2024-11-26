@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.apt.mapper.AptMapper">
+		<resultMap type="AptDto" id="AptDto">
+			<result column="apt_id" property="aptId"/>
+			<result column="apt_name" property="aptName"/>
+			<result column="building" property="building"/>
+			<result column="construction_year" property="constructionYear"/>
+			<result column="road_address" property="roadAddress"/>
+			<result column="legal_address" property="legalAddress"/>
+			<result column="lat" property="lat"/>
+			<result column="lon" property="lon"/>
+		</resultMap>
+	
+	  <!-- 법정동 코드로 아파트 가져오는 코드-->
+	  <select id="getAllApartment" parameterType="String" resultMap="AptDto">
+	    SELECT apt_id, apt_name, building, construction_year, road_address, legal_address, lat, lon
+	    FROM aptinfo
+	    WHERE region_code = #{regionCode}
+	  </select>
+	  
+	  <!-- 법정동 코드로 아파트 가져오는 코드-->
+	  <select id="searchApartmentByDongName" parameterType="String" resultMap="AptDto">
+	  	SELECT apt_id, apt_name, building, construction_year, road_address, legal_address, lat, lon
+	  	FROM aptinfo
+		WHERE TRIM(legal_dong) = #{dongName};
+	  </select>
+	  
+
+	  
+</mapper>	

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.house.mapper.HouseDetailMapper">
+
+	<select id="getHouseDetail" parameterType="Long">
+	    select info.apartmentName, 
+	           info.aptCode, 
+	           concat(deal.dealYear, '-', deal.dealMonth, '-', deal.dealDay) as dealDate, 
+	           deal.dealAmount, 
+	           deal.floor, 
+	           deal.area
+	    from houseinfo as info
+	    inner join housedeal as deal
+	    on info.aptCode = deal.aptCode
+	    where info.aptCode = #{aptCode}
+	 </select>
+
+	  
+</mapper>	

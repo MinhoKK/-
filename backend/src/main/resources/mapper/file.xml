@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.ssafy.file.mapper.FileMapper">
+	
+	<resultMap type="file" id="file">
+		<result column="file_board_id" property="fileBoardId"/>
+		<result column="board_id" property="boardId"/>
+		<result column="file_url" property="fileUrl"/>
+	</resultMap>
+	
+
+	
+	<insert id="saveFile">
+		insert into file_board (board_id, file_url) 
+		values (#{boardId}, #{fileUrl})
+	</insert>
+	
+	<select id="findFiles">
+		select file_url
+		from file_board
+		where board_id = #{boardId}
+	</select>
+
+	<delete id="deleteFiles">
+		delete from file_board where board_id = #{boardId}
+	</delete>
+
+</mapper>

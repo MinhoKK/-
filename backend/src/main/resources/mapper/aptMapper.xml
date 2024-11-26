@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.apt.mapper.AptMapper">
+
+	  	<!-- Apt 개괄정보 -->
+	  	<resultMap type="AptDto" id="AptDto">
+			<result column="apt_id" property="aptId"/>
+			<result column="apt_name" property="aptName"/>
+			<result column="construction_year" property="constructionYear"/>
+			<result column="road_address" property="roadAddress"/>
+			<result column="summary_area" property="summaryArea"/>
+			<result column="summary_amount" property="summaryAmount"/>
+			<result column="lat" property="lat"/>
+			<result column="lon" property="lon"/>
+		</resultMap>
+		
+		<!-- Apt 거래 정보 -->
+		<resultMap type="AptDealDto" id="AptDealDto">
+			<result column="deal_amount" property="dealAmount"/>
+			<result column="deal_date" property="dealDate"/>
+			<result column="area" property="area"/>
+			<result column="floor" property="floor"/>
+		</resultMap>
+		
+		<!-- 법정동 검색결과 정보 -->
+		<resultMap type="SearchDongDto" id="SearchDongDto">
+			<result column="legal_dong_full_code" property="legalDongFullCode"/>
+			<result column="legal_address" property="legalAddress"/>
+		</resultMap>
+		
+	  <!-- 법정동 코드로 아파트 가져오는 코드-->
+	  <select id="getAllApartment" parameterType="String" resultMap="AptDto">
+		SELECT 
+		    info.apt_id,
+		    info.apt_name,
+		    info.construction_year,
+		    info.road_address,
+		    deal.area as summary_area,
+		    AVG(deal.deal_amount) AS summary_amount,
+		    info.lat,
+		    info.lon
+		FROM
+		    aptdeal AS deal
+		INNER JOIN aptinfo AS info ON deal.apt_id = info.apt_id
+		WHERE
+			info.legal_dong_full_code = #{dongCode}
+		GROUP BY deal.apt_id, deal.area
+		HAVING 
+		    COUNT(deal.area) = (
+		        SELECT 
+		            COUNT(area) 
+		        FROM 
+		            aptdeal 
+		        WHERE 
+		            apt_id = deal.apt_id 
+		        GROUP BY 
+		            area 
+		        ORDER BY 
+		            COUNT(area) DESC 
+		        LIMIT 1
+		    );
+	  </select>
+	  
+	  <!-- 법정동 코드로 아파트 가져오는 코드-->
+	  <select id="searchApartmentByDongName" parameterType="String" resultMap="AptDto">
+	  	SELECT apt_id, apt_name, summary_area, summary_amount, lat, lon
+	  	FROM aptinfo
+		WHERE legal_dong = #{dongName};
+	  </select>
+	  
+	  <!-- Polygon을 기준으로 polygon 내 아파트를 검색하는 코드-->
+	  <select id="searchApartmentByPolygon" parameterType="String" resultMap="AptDto">
+		SELECT 
+		    info.apt_id,
+		    info.apt_name,
+		    info.construction_year,
+		    info.road_address,
+		    deal.area as summary_area,
+		    AVG(deal.deal_amount) AS summary_amount,
+		    info.lat,
+		    info.lon
+		FROM
+		    aptdeal AS deal
+		INNER JOIN aptinfo AS info ON deal.apt_id = info.apt_id
+		WHERE
+			ST_Contains(${polygon}, geom_point)
+		GROUP BY deal.apt_id, deal.area
+		HAVING 
+		    COUNT(deal.area) = (
+		        SELECT 
+		            COUNT(area) 
+		        FROM 
+		            aptdeal 
+		        WHERE 
+		            apt_id = deal.apt_id 
+		        GROUP BY 
+		            area 
+		        ORDER BY 
+		            COUNT(area) DESC 
+		        LIMIT 1
+		    );
+	  </select>
+	
+	<!-- 아파트 코드를 기준으로 거래내역 가져오는 쿼리 -->
+	<select id="searchApartmentDealByCode" parameterType="String" resultMap="AptDealDto">
+	SELECT 
+	    deal_amount,
+	    STR_TO_DATE(CONCAT(deal_year, '-', deal_month, '-', deal_day), '%Y-%m-%d') AS deal_date,
+	    area,
+	    floor
+	FROM 
+	    aptdeal
+	WHERE apt_id = #{aptId}
+	ORDER BY deal_date;
+	</select>
+	
+	<!-- 사용자가 입력하는 법정동 텍스트를 기반으로 검색 결과 가져옴 -->
+	<select id="searchDong" parameterType="String" resultMap="SearchDongDto">
+	  SELECT legal_dong_full_code, legal_address
+	  FROM dong_code
+	  WHERE MATCH(legal_address) AGAINST('*${dongName}*' IN boolean mode);
+	</select>
+	
+</mapper>	

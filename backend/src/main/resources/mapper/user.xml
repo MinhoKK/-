@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.ssafy.user.mapper.UserMapper">
+	
+	<resultMap type="user" id="user">
+		<result column="user_id" property="userId"/>
+		<result column="password" property="password"/>
+		<result column="name" property="name"/>
+		<result column="address" property="address"/>
+		<result column="role" property="role"/>
+	</resultMap>
+	
+	<!-- Apt 개괄정보 -->
+  	<resultMap type="AptDto" id="AptDto">
+		<result column="apt_id" property="aptId"/>
+		<result column="apt_name" property="aptName"/>
+		<result column="construction_year" property="constructionYear"/>
+		<result column="road_address" property="roadAddress"/>
+		<result column="summary_area" property="summaryArea"/>
+		<result column="summary_amount" property="summaryAmount"/>
+		<result column="lat" property="lat"/>
+		<result column="lon" property="lon"/>
+	</resultMap>
+	
+	<select id="login" resultMap="user">
+		select *
+		from users
+		where user_id = #{userId} and password = #{password}
+	</select>
+	
+	<insert id="join">
+		insert into users (user_id, password, name, address)
+		values (#{userId}, #{password}, #{name}, #{address})
+	</insert>
+
+	<update id="modify">
+		update users set address = #{address}, password = #{password}
+		where user_id = #{userId}
+	</update>
+	
+	<select id="findByUserId" resultMap="user">
+		select *
+		from users
+		where user_id = #{userId}
+	</select>
+	
+	<sql id="search">
+		<if test="word != null and word != ''">
+			<if test="key == 'address'">
+				where address like concat('%', #{word}, '%')
+			</if>
+			<if test="key == 'role'">
+				where role = #{word}
+			</if>
+		</if>
+	</sql>
+	
+	<select id="findAll" parameterType="map" resultMap="user">
+		select *
+		from users
+		<include refid="search"></include>
+	</select>
+	
+	<update id="modifyByAdmin">
+		update users set user_id = #{userId}, password = #{password}, name = #{name}, address = #{address}, role = #{role}
+		where user_id = #{userId}
+	</update>
+	
+	<delete id="delete">
+		delete from users 
+		where user_id = #{userId}
+	</delete>
+	
+	<select id="findLikeAptList" parameterType="String" resultMap="AptDto">
+		SELECT 
+		    info.apt_id,
+		    info.apt_name,
+		    info.construction_year,
+		    info.road_address,
+		    deal.area as summary_area,
+		    AVG(deal.deal_amount) AS summary_amount,
+		    info.lat,
+		    info.lon
+		FROM
+		    aptdeal AS deal
+		INNER JOIN aptinfo AS info ON deal.apt_id = info.apt_id
+		WHERE info.apt_id
+			IN (SELECT apt_id FROM user_house_like WHERE user_id = #{userId})
+		GROUP BY deal.apt_id, deal.area
+		HAVING 
+		    COUNT(deal.area) = (
+		        SELECT 
+		            COUNT(area) 
+		        FROM 
+		            aptdeal 
+		        WHERE 
+		            apt_id = deal.apt_id 
+		        GROUP BY 
+		            area 
+		        ORDER BY 
+		            COUNT(area) DESC 
+		        LIMIT 1
+		    );
+		
+	</select>
+
+</mapper>
